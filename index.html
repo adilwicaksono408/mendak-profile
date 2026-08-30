@@ -159,8 +159,12 @@
     height:150px; display:flex; align-items:center; justify-content:center;
     background:linear-gradient(135deg, var(--hijau-padi) 0%, var(--hijau-padi-tua) 100%);
     color:rgba(251,248,240,0.85);
+    position:relative; overflow:hidden;
   }
-  .potensi-img svg{width:44px; height:44px;}
+  .potensi-img img{width:100%; height:100%; object-fit:cover; position:absolute; inset:0;}
+  .potensi-img svg{width:44px; height:44px; position:relative; z-index:1; display:none;}
+  .potensi-img img.img-error + svg{display:block;}
+  .potensi-img img.img-error{display:none;}
   .potensi-body{padding:22px;}
   .potensi-body h3{font-family:'Fraunces',serif; font-size:1.1rem; color:var(--hijau-padi-tua); margin-bottom:8px;}
   .potensi-body p{font-size:0.9rem; color:rgba(74,53,39,0.72);}
@@ -380,33 +384,63 @@
 
 /* Responsive - Mobile: Ubah jadi vertikal sederhana */
 @media (max-width: 768px) {
+  .tree-container{ padding: 20px 0; overflow-x: hidden; }
+
+  /* Matikan gaya "pohon" tabel + garis penghubung; ganti jadi list bertingkat */
   .org-tree, .org-tree ul, .org-tree li {
     display: block;
     text-align: left;
-    padding-left: 20px;
   }
-  .org-tree li {
-    padding: 15px 0 0 20px;
-  }
+  .org-tree{ padding: 0; }
+  .org-tree > li{ padding: 0; }
+  .org-tree li{ padding: 0; }
   .org-tree li::before,
-  .org-tree li::after {
+  .org-tree li::after,
+  .org-tree ul ul::before{
     display: none;
   }
-  .org-tree ul {
-    margin-left: 20px;
-    border-left: 2px solid #cbd5e1;
+
+  /* Level 1 - Kepala Dukuh */
+  .org-card--top{
+    display: flex; text-align: left; margin-bottom: 18px;
   }
-  .org-card {
-    min-width: 100%;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+
+  /* Level 2 - PKK / Juru Kunci / Ketua RW: berjajar penuh, diberi jarak */
+  .org-tree > li > ul{
+    display: flex; flex-direction: column; gap: 12px;
+    padding-left: 14px; margin-bottom: 18px;
+    border-left: 2px solid var(--garis, #d8cfb8);
   }
-  .org-card--top {
-    display: block;
-    text-align: center;
+  .org-tree > li > ul > li.branch-adat{ border-left: none; }
+  .org-tree > li > ul > li > ul.rt-list{
+    border-left: 2px solid var(--garis, #d8cfb8);
+    margin: 12px 0 0 14px;
   }
+
+  .org-card{
+    width: 100%; min-width: 0; text-align: left;
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 15px;
+  }
+  .org-card h4{ font-size: 0.88rem; line-height:1.25; }
+  .org-card p{ font-size: 0.72rem; }
+  .org-avatar{ flex-shrink: 0; }
+
+  /* Level 3 - RT: grid 2 kolom biar tidak jadi list panjang membosankan */
+  .rt-list{
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .rt-list .org-card{
+    flex-direction: column; text-align: center; gap: 6px; padding: 14px 10px;
+  }
+  .rt-list .org-card h4{ font-size: 0.8rem; }
+  .rt-list .org-card p{ font-size: 0.68rem; }
+}
+
+@media (max-width: 380px){
+  .rt-list{ grid-template-columns: 1fr 1fr; gap: 8px; }
 }
 
   /* ---------- karang taruna ---------- */
@@ -494,13 +528,28 @@
         var(--hijau-padi-tua) 100%
     );
     color: rgba(251, 248, 240, 0.85);
+    position: relative;
+    overflow: hidden;
 }
 
-/* Ukuran icon diperbesar */
+.programkerjakkn-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+}
+
+/* Ukuran icon diperbesar (fallback, hanya muncul jika foto gagal dimuat) */
 .programkerjakkn-img svg {
     width: 70px;
     height: 70px;
+    position: relative;
+    z-index: 1;
+    display: none;
 }
+.programkerjakkn-img img.img-error + svg { display: block; }
+.programkerjakkn-img img.img-error { display: none; }
 
 /* Isi Card */
 .programkerjakkn-body {
@@ -638,9 +687,11 @@
 
   /* ---------- floating action buttons ---------- */
   .fab-stack{
-    position:fixed; right:22px; bottom:22px; z-index:60;
+    position:fixed; right:22px; bottom:22px; z-index:9999;
     display:flex; flex-direction:column; align-items:flex-end; gap:12px;
+    pointer-events:none;
   }
+  .fab-stack .fab{ pointer-events:auto; }
   .fab{
     display:flex; align-items:center; gap:10px;
     background:var(--emas-kunyit); color:var(--nila-kain);
@@ -648,9 +699,10 @@
     box-shadow:0 10px 24px rgba(38,51,65,0.28);
     transition:transform .18s ease, box-shadow .18s ease;
     white-space:nowrap;
+    cursor:pointer;
   }
   .fab:hover{transform:translateY(-3px); box-shadow:0 14px 28px rgba(38,51,65,0.34);}
-  .fab svg{width:18px; height:18px; flex-shrink:0;}
+  .fab svg{width:18px; height:18px; flex-shrink:0; pointer-events:none;}
   .fab-top{
     background:var(--putih-mori); color:var(--hijau-padi-tua);
     width:44px; height:44px; padding:0; justify-content:center;
@@ -658,10 +710,11 @@
     opacity:0; visibility:hidden; transform:translateY(8px);
     transition:opacity .25s ease, transform .25s ease, visibility .25s ease;
   }
-  .fab-top.show{opacity:1; visibility:visible; transform:translateY(0);}
+  .fab-top.show{opacity:1; visibility:visible; transform:translateY(0); pointer-events:auto;}
   @media (max-width:640px){
     .fab span.fab-label{display:none;}
     .fab{padding:14px; border-radius:50%;}
+    .fab-stack{ bottom: max(18px, env(safe-area-inset-bottom)); }
   }
 </style>
 </head>
@@ -807,7 +860,7 @@
     <div class="potensi-grid reveal-stagger">
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="kebuntelo.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v6M12 22v-6M2 12h6M22 12h-6"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <img src="kebuntelo.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v6M12 22v-6M2 12h6M22 12h-6"/><circle cx="12" cy="12" r="3"/></svg></div>
         <div class="potensi-body">
           <span class="chip">Ladang Pertanian</span>
           <h3>Singkong</h3>
@@ -816,7 +869,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="peternakan.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
+          <img src="peternakan.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
         <div class="potensi-body">
           <span class="chip">Peternakan</span>
           <h3>Peternakan warga</h3>
@@ -825,7 +878,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="kayu.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
+          <img src="kayu.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
         <div class="potensi-body">
           <span class="chip">Pengrajin Kayu</span>
           <h3>Pengrajin Kayu</h3>
@@ -834,7 +887,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="rotibakar.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
+          <img src="rotibakar.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
         <div class="potensi-body">
           <span class="chip">UMKM Kuliner</span>
           <h3>Roti Bakar Sari Edo Group</h3>
@@ -843,7 +896,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="esdawet.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
+          <img src="esdawet.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
         <div class="potensi-body">
           <span class="chip">UMKM Kuliner</span>
           <h3>Es Dawet Jawa Mbah Muji</h3>
@@ -852,7 +905,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="dimsum.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
+          <img src="dimsum.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
         <div class="potensi-body">
           <span class="chip">UMKM Kuliner</span>
           <h3>Misabao Dimsum</h3>
@@ -861,7 +914,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="pempek.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
+          <img src="pempek.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
         <div class="potensi-body">
           <span class="chip">UMKM Kuliner</span>
           <h3>Pempek Mas Rio</h3>
@@ -870,7 +923,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="nasibakar.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
+          <img src="nasibakar.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
         <div class="potensi-body">
           <span class="chip">UMKM Kuliner</span>
           <h3>Nasi Bakar Ayam Suwir "Mbak Yani"</h3>
@@ -879,7 +932,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="sister.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
+          <img src="sister.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
         <div class="potensi-body">
           <span class="chip">UMKM Kuliner</span>
           <h3>Sister's Snack</h3>
@@ -888,7 +941,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="bengkel.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
+          <img src="bengkel.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
         <div class="potensi-body">
           <span class="chip">UMKM Kuliner</span>
           <h3>Bengkel Aluamah</h3>
@@ -897,7 +950,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="kens.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
+          <img src="kens.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9a1 1 0 011-1h14a1 1 0 011 1v12"/><path d="M9 21v-6h6v6"/><path d="M9 3h6l2 5H7l2-5z"/></svg></div>
         <div class="potensi-body">
           <span class="chip">UMKM Kuliner</span>
           <h3>Keens Bakery</h3>
@@ -906,7 +959,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="rias.webp" loading="lazy" decoding="async" alt="Ayo joget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 3 5-7"/></svg></div>
+          <img src="rias.jpeg" loading="lazy" decoding="async" alt="Ayo joget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 3 5-7"/></svg></div>
         <div class="potensi-body">
           <span class="chip">Rias dan Kostum</span>
           <h3>Queen Art Studio Gunungkidul</h3>
@@ -915,7 +968,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-           <img src="sekar.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 3 5-7"/></svg></div>
+           <img src="sekar.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 3 5-7"/></svg></div>
         <div class="potensi-body">
           <span class="chip">Kelompok Tari</span>
           <h3>Sanggar Tari Sekar Nyentrik</h3>
@@ -924,7 +977,7 @@
         </div>
       <div class="potensi-card">
         <div class="potensi-img">
-          <img src="ayojoget.webp" loading="lazy" decoding="async" alt="Ayo joget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 3 5-7"/></svg></div>
+          <img src="ayojoget.png" loading="lazy" decoding="async" alt="Ayo joget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 3 5-7"/></svg></div>
         <div class="potensi-body">
           <span class="chip">Kelompok Tari</span>
           <h3>Ayo Njoged</h3>
@@ -933,7 +986,7 @@
       </div>
       <div class="potensi-card">
         <div class="potensi-img">
-           <img src="gotongroyong.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/></svg></div>
+           <img src="gotongroyong.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/></svg></div>
         <div class="potensi-body">
           <span class="chip">Kearifan Lokal</span>
           <h3>Gotong Royong</h3>
@@ -1032,7 +1085,6 @@
               </div>
             </li>
 
-          <ul>
             <li class="branch-adat">
               <div class="org-card org-card--adat">
                 <div class="org-avatar org-avatar--adat">
@@ -1060,7 +1112,7 @@
               </div>
 
               <!-- LEVEL 3: RT 01 - RT 13 -->
-              <ul>
+              <ul class="rt-list">
                 <li>
                   <div class="org-card">
                     <div class="org-avatar">
@@ -1226,7 +1278,7 @@
   </div>
 </section>
 
-<!-- KARANG TARUNA -->
+<!-- KARANG TARUNA (KEEP MARKER) -->
 <section id="karang-taruna" style="background:var(--putih-mori);">
   <div class="wrap">
     <div class="section-head reveal">
@@ -1330,7 +1382,7 @@
         <!-- PROGRAM 1 -->
         <div class="programkerjakkn-card">
             <div class="programkerjakkn-img">
-                <img src="gapar.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <img src="gapar.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/>
                 </svg>
             </div>
@@ -1364,7 +1416,7 @@
         <!-- PROGRAM 2 -->
         <div class="programkerjakkn-card">
             <div class="programkerjakkn-img">
-                <img src="manajemen.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <img src="manajemen.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/>
                 </svg>
             </div>
@@ -1383,7 +1435,7 @@
         <!-- PROGRAM 3 -->
         <div class="programkerjakkn-card">
             <div class="programkerjakkn-img">
-                <img src="farmasi.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <img src="farmasi.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/>
                 </svg>
             </div>
@@ -1401,7 +1453,7 @@
         <!-- PROGRAM 4 -->
         <div class="programkerjakkn-card">
             <div class="programkerjakkn-img">
-              <img src="hukumihong.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <img src="hukumihong.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/>
                 </svg>
             </div>
@@ -1418,7 +1470,7 @@
         <!-- PROGRAM 5 -->
         <div class="programkerjakkn-card">
             <div class="programkerjakkn-img">
-                <img src="hukumakmal.webp" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <img src="hukumakmal.jpg" loading="lazy" decoding="async"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/>
                 </svg>
             </div>
@@ -1563,11 +1615,18 @@
   menuBtn.addEventListener('click', () => navLinks.classList.toggle('open'));
   navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
 
-  // Loading screen
-  window.addEventListener('load', () => {
-    const loader = document.getElementById('loader');
-    setTimeout(() => loader.classList.add('hide'), 1600);
-  });
+  // Loading screen (dengan fallback agar tidak pernah "nyangkut" menutupi halaman)
+  const loader = document.getElementById('loader');
+  let loaderHidden = false;
+  function hideLoader(){
+    if (loaderHidden) return;
+    loaderHidden = true;
+    loader.classList.add('hide');
+  }
+  window.addEventListener('load', () => setTimeout(hideLoader, 1600));
+  // Jaring pengaman: kalau event 'load' telat (koneksi lambat / resource gagal),
+  // paksa sembunyikan loader maksimal 4 detik setelah halaman dibuka.
+  setTimeout(hideLoader, 4000);
 
   // Scroll reveal
   const revealEls = document.querySelectorAll('.reveal, .reveal-stagger');
@@ -1580,6 +1639,11 @@
     });
   }, { threshold: 0.15 });
   revealEls.forEach(el => io.observe(el));
+
+  // Tampilkan ikon fallback kalau foto gagal dimuat (link putus / file belum ada)
+  document.querySelectorAll('.potensi-img img, .programkerjakkn-img img').forEach(img => {
+    img.addEventListener('error', () => img.classList.add('img-error'));
+  });
 
   // Back-to-top visibility
   const fabTop = document.getElementById('fabTop');
